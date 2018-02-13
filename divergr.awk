@@ -61,7 +61,7 @@ END {
           for (base in seqA[seqPosQuery][seqHeaderQuery]) {
             baseQuery = seqA[seqPosQuery][seqHeaderQuery][base]
             baseSearch = seqA[seqPosSearch][seqHeaderSearch][base]
-#           Rule: gap-gap reduce length
+            # Rule: gap-gap reduce length
             if (rules ~ /gg/) {
               if ((baseQuery == "-")&&(baseSearch == "-")) {
                 seqLenChange--
@@ -72,7 +72,7 @@ END {
                 continue
               }
             }
-#           Rule: gap-site reduce length
+            # Rule: gap-site reduce length
             if (rules ~ /gs/) {
               if (((baseQuery == "-")&&(baseSearch != "-"))||
                   ((baseQuery != "-")&&(baseSearch == "-"))) {
@@ -95,7 +95,7 @@ END {
                 continue
               }
             }
-#           Rule: N-site reduce length
+            # Rule: N-site reduce length
             if (rules ~ /ns/) {
               if (((baseQuery == "N")&&(baseSearch != "N"))||
                   ((baseQuery != "N")&&(baseSearch == "N"))) {
@@ -107,7 +107,7 @@ END {
                 continue
               }
             }
-#           Counted differences in sites
+            # Counted differences in sites
             if (baseQuery != baseSearch) {
               baseDiff++
               if (debug) {
