@@ -218,9 +218,9 @@ END {
 
   if (printTotal) {
     printf("%s\t", FILENAME)
-    printf("Min:\t%.2f", minDivR)
-    printf("\tMax:\t%.2f", maxDivR)
-    printf("\tMean:\t%.2f", divRSum / seqNum)
-    printf("\tMed:\t%.2f\n", median)
+    printf("Min:\t%.4f", minDivR)
+    printf("\tMax:\t%.4f", maxDivR)
+    printf("\tMean:\t%.4f", divRSum / seqNum)
+    printf("\tMed:\t%.4f\n", median)
   }
 }
