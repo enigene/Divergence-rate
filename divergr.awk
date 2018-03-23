@@ -1,4 +1,3 @@
-# Divergence rate, 13 Feb 2018
 # Calculate pairwise sequence divergence rate beween aligned FASTA sequnces
 # Author: Lev I. Uralsky (Institute of Molecular Genetics, Moscow, Russia)
 # Usage: gawk -v rules=ggsnns -f divergr.awk alignment.fas > output.txt
@@ -9,8 +8,6 @@
 
 BEGIN {
   IGNORECASE = 1
-  # default print option
-  if (!(printSeq||printTotal)) printDivAll = 1
  }
 
 /^>/ {
@@ -40,13 +37,7 @@ END {
     "\" seqHeader=\"" j "\" baseNum=\"" k "\" base=\"" seqA[i][j][k] "\""
   }
 
-  if (printSeq) {
-    print "Num\tName\tMean\tMedian"
-  }
-
-  if (printDivAll) {
-    print "Num\tName\tDiv"
-  }
+  print "Num\tName\tDiv"
 
   # seqA: seqA[seqNum][seqHeader][baseNum]=base
   for (seqPosQuery = 1; seqPosQuery <= seqNum; seqPosQuery++) {
@@ -135,58 +126,36 @@ END {
     }
   }
 
-  for (i = 1; i <= seqNum; i++) {
-    score = 0
-    qLen = asort(divrA[i], divrAS)
-
-    # calculate median divergence for each sequence
-    if (qLen % 2) {
-      median = divrAS[(qLen + 1) / 2]
-    } else {
-      lowMed = divrAS[qLen / 2]
-      highMed = divrAS[(qLen / 2) + 1]
-      median = (lowMed + highMed) / 2
-    }
-    medA[i] = median
-
-    # calculate mean divergence for each sequence
-    for (j in divrA[i]) {
-      score += divrA[i][j]
-    }
-    divR = score / qLen
-
-    if (printDivAll) {
-      for (seqHeaderSearch in divrA[i]) {
-        for (seqHeaderQuery in seqA[i]) {
-          sub(/>/, "", seqHeaderQuery)
-          printf("%s\t%s.%s.%s\t", ++b, seqHeaderQuery, i, seqHeaderSearch)
-        }
-        printf("%.2f\n", divrA[i][seqHeaderSearch])
-      }
-    }
-
-    if (printSeq) {
-      for (seqHeaderQuery in seqA[i]) {
+  for (seqPosQuery = 1; seqPosQuery <= seqNum; seqPosQuery++) {
+    for (seqPosSearch in divrA[seqPosQuery]) {
+      for (seqHeaderQuery in seqA[seqPosQuery]) {
         sub(/>/, "", seqHeaderQuery)
-        printf("%s\t%s\t%.2f\t%.2f\n", i, seqHeaderQuery, divR, median)
+        printf("%s\t%s.%s.%s\t", ++b, seqHeaderQuery, seqPosQuery, seqPosSearch)
+      }
+      divrAList[++cnt] = sprintf("%f", divrA[seqPosQuery][seqPosSearch])
+      printf("%f\n", divrAList[cnt])
+
+      if (printTotal) {
+        # min and max divergence
+        if ((minDivr == 0)||(divrAList[cnt] < minDivr)) { minDivr = divrAList[cnt] }
+        if ((maxDivr == 0)||(divrAList[cnt] > maxDivr)) { maxDivr = divrAList[cnt] }
+        divrSum += divrAList[cnt]
       }
     }
-
-    # min and max divergence
-    if ((minDivR == 0)||(divR < minDivR)) { minDivR = divR }
-    if ((maxDivR == 0)||(divR > maxDivR)) { maxDivR = divR }
-    divRSum += divR
   }
 
-  # calculate median divergence for all sequences
-  # using median values (!)
-  mLen = asort(medA)
-  if (mLen % 2) {
-    median = medA[(mLen + 1) / 2]
-  } else {
-    lowMed = medA[mLen / 2]
-    highMed = medA[(mLen / 2) + 1]
-    median = (lowMed + highMed) / 2
+  if (printTotal) {
+    # calculate median divergence
+    listLen = asort(divrAList)
+    if (listLen % 2) {
+      medDivr = divrAList[(listLen + 1) / 2]
+    } else {
+      lowmed = divrAList[listLen / 2]
+      highmed = divrAList[(listLen / 2) + 1]
+      medDivr = (lowmed + highmed) / 2
+    }
+    # calculate average divergence
+    meanDivr = divrSum / listLen
   }
 
   if (debug) {
@@ -218,9 +187,9 @@ END {
 
   if (printTotal) {
     printf("%s\t", FILENAME)
-    printf("Min:\t%.4f", minDivR)
-    printf("\tMax:\t%.4f", maxDivR)
-    printf("\tMean:\t%.4f", divRSum / seqNum)
-    printf("\tMed:\t%.4f\n", median)
+    printf("Min:\t%f", minDivr)
+    printf("\tMax:\t%f", maxDivr)
+    printf("\tMean:\t%f", meanDivr)
+    printf("\tMed:\t%f\n", medDivr)
   }
 }
