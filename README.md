@@ -17,7 +17,5 @@ Multiple rules can be used:
 + ggsnns includes all of the above.
 
 ### Options:
-+ `-v printDivAll=1` — prints divergence for each sequence with all sequences, except itself (default);
-+ `-v printSeq=1` — prints mean and median divergence for each sequences;
 + `-v printTotal=1` — prints minimal, maximum, mean, and median divergence for all sequences;
 + `-v debug=1` — prints variables, arrays and statements during execution.
