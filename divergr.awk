@@ -116,30 +116,25 @@ END {
           }
           if (seqLenChange > 0) {
             divrA[seqPosQuery][seqPosSearch] = baseDiff / seqLenChange
-            divrA[seqPosSearch][seqPosQuery] = baseDiff / seqLenChange
           } else {
             divrA[seqPosQuery][seqPosSearch] = 0
-            divrA[seqPosSearch][seqPosQuery] = 0
           }
+
+          copyOfSeqHeaderQuery = seqHeaderQuery
+          sub(/>/, "", copyOfSeqHeaderQuery)
+          printf("%s\t%s.%s.%s\t", ++b, copyOfSeqHeaderQuery, seqPosQuery, seqPosSearch)
+
+          divrAList[++cnt] = sprintf("%f", divrA[seqPosQuery][seqPosSearch])
+          printf("%f\n", divrAList[cnt])
+
+          if (printTotal) {
+            # min and max divergence
+            if ((minDivr == 0)||(divrAList[cnt] < minDivr)) { minDivr = divrAList[cnt] }
+            if ((maxDivr == 0)||(divrAList[cnt] > maxDivr)) { maxDivr = divrAList[cnt] }
+            divrSum += divrAList[cnt]
+          }
+
         }
-      }
-    }
-  }
-
-  for (seqPosQuery = 1; seqPosQuery <= seqNum; seqPosQuery++) {
-    for (seqPosSearch in divrA[seqPosQuery]) {
-      for (seqHeaderQuery in seqA[seqPosQuery]) {
-        sub(/>/, "", seqHeaderQuery)
-        printf("%s\t%s.%s.%s\t", ++b, seqHeaderQuery, seqPosQuery, seqPosSearch)
-      }
-      divrAList[++cnt] = sprintf("%f", divrA[seqPosQuery][seqPosSearch])
-      printf("%f\n", divrAList[cnt])
-
-      if (printTotal) {
-        # min and max divergence
-        if ((minDivr == 0)||(divrAList[cnt] < minDivr)) { minDivr = divrAList[cnt] }
-        if ((maxDivr == 0)||(divrAList[cnt] > maxDivr)) { maxDivr = divrAList[cnt] }
-        divrSum += divrAList[cnt]
       }
     }
   }
